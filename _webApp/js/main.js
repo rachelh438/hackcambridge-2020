@@ -21,6 +21,21 @@ jQuery(document).ready(function () {
 	});
 });
 
+function getStatsDemo(rating) {
+	//fetch data for esg stats
+	if(rating >= 74){
+		level=4;
+	}else if(rating>=50 && rating<75){
+		level=3;
+	}else if(rating>=25 && rating<50){
+		level=2;
+	}else{
+		level=1;
+	}
+	bar.animate(rating/100);
+	//update tree image
+	document.getElementById("tree-img").src = "images/stage-".concat(level.toString(),"-tree.png");
+}
 //UPDATE STATS
 async function getStats() {
 	//fetch data for esg stats
@@ -30,12 +45,9 @@ async function getStats() {
 		.then(function (response) {
 			return response.text();
 		}).then(function (text) {
-			console.log('Rating:');
-			console.log(text); // Print the greeting as text
 			rating = parseFloat(text);
-			console.log(typeof(rating))
 		});
-	if(rating >= 75){
+	if(rating >= 74){
 		level=4;
 	}else if(rating>=50 && rating<75){
 		level=3;
@@ -44,14 +56,24 @@ async function getStats() {
 	}else{
 		level=1;
 	}
-	console.log(level);
 	bar.animate(rating/100);
 	//update tree image
 	document.getElementById("tree-img").src = "images/stage-".concat(level.toString(),"-tree.png");
-	console.log(level);
 	//update bar value and animate
 	bar.value()=90;
 	bar.animate(bar.value()/100);
+}
+
+async function Update() {
+	//fetch data for esg stats
+	var level=1;
+	var rating;
+	await fetch('https://sustainstocks.azurewebsites.net/api/v1/update')
+		.then(function (response) {
+			return response.text();
+		}).then(function (text) {
+			console.log(text); // Print text
+		});
 }
 
 //Semi Circle Bar animation
@@ -88,4 +110,19 @@ bar.text.style.fontSize = '1.5rem';
 
 bar.animate(1);  // Number from 0.0 to 1.0
 
-setInterval(getStats, 5000);
+
+var i = 0;                     //  set your counter to 1
+function myLoop () {           //  create a loop function
+   setTimeout(function () {    //  call a 3s setTimeout when the loop is called
+      getStatsDemo(i);          //  your code here
+      i+=15;                     //  increment the counter
+      if (i < 90) {            //  if the counter < 10, call the loop function
+         myLoop();             //  ..  again which will trigger another 
+      }                        //  ..  setTimeout()
+   }, 2000)
+}
+
+myLoop();
+//setInterval(getStatsDemo(50),1000);
+//setInterval(StatsDemo,2000);
+//setTimeout(Update, 1000);
